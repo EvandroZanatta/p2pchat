@@ -1,0 +1,21 @@
+{
+  "name": "p2pvideochat",
+  "version": "1.0.0",
+  "description": "Video Chat com tecnologia P2P",
+  "main": "p2p.js",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "express": "^4.15.2",
+    "md5": "^2.2.1",
+    "mysql": "^2.13.0",
+    "peer": "^0.2.8",
+    "socket.io": "^2.0.3",
+    "twig": "^1.10.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Evandro Bruno Zanatta",
+  "license": "ISC"
+}

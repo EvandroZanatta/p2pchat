@@ -1,0 +1,68 @@
+{% include 'header.twig' %} 
+
+<h1>Conversando com </h1>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js" ></script>
+
+<video id="video-internal" class="video-internal" muted="true" autoplay></video>
+<video id="video-external" class="video-external" autoplay></video>
+
+
+
+<script>
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+navigator.getUserMedia({
+    audio: true,
+    video: true
+},
+function(stream) {
+    // Set your video displays
+    $('#video-internal').prop('src', URL.createObjectURL(stream));
+    window.localStream = stream;
+},
+function() {
+    console.log("Erro ao acessar video");
+});
+
+var peerNode = {{ user_id }};
+
+var peer = new Peer(peerNode, {
+    host: 'peerjsserver222.herokuapp.com',
+    port: 443,
+    secure: true,
+    config: {
+        'iceServers': [{
+            url: 'stun:stun01.sipphone.com'
+        }, {
+            url: 'stun:stun.ekiga.net'
+        }, {
+            url: 'stun:stunserver.org'
+        }, {
+            url: 'stun:stun.softjoys.com'
+        }, {
+            url: 'stun:stun.voiparound.com'
+        }, {
+            url: 'stun:stun.voipbuster.com'
+        }, {
+            url: 'stun:stun.voipstunt.com'
+        }, {
+            url: 'stun:stun.voxgratia.org'
+        }, {
+            url: 'stun:stun.xten.com'
+        }, {
+            url: 'turn:192.158.29.39:3478?transport=udp',
+            credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+            username: '28224511:1379330808'
+        }, {
+            url: 'turn:192.158.29.39:3478?transport=tcp',
+            credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+            username: '28224511:1379330808'
+        }]
+    },
+    debug: 3
+});
+
+</script>
+{% include 'footer.twig' %}
