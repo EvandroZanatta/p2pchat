@@ -146,7 +146,6 @@ app.get('/chats/', function(req, res) {
     function showView() {
 
         res.render('chats.twig', {
-            users: users,
             user_logged: user_logged_id
         });
     }
@@ -155,8 +154,7 @@ app.get('/chats/', function(req, res) {
         connection.query("SELECT usr.id AS id, usr.name AS name FROM `users` as usr INNER JOIN `sessions` as ses ON usr.id = ses.id_user WHERE ses.token= '" + user_token + "';", function(err, rows, fields) {
             if (err) throw err;
 
-            user_logged_id['id'] = rows[0]['id'];
-            user_logged_id['name'] = rows[0]['name'];
+            user_logged_id = rows[0]['id'];
 
             showView();
         });
@@ -167,24 +165,7 @@ app.get('/chats/', function(req, res) {
 
 });
 
-app.use(cookieParser());
 
-app.get('/chat/', function(req, res) {
-
-    var user_id;
-
-    function showView() {
-        res.render('chat.twig', {
-            user_id: user_id
-        });
-    }
-
-    connection.query("SELECT id_user FROM `sessions` WHERE `token` = '" + req.cookies['p2p_token'] + "';", function(err, rows, fields) {
-        if (err) throw err;
-        user_id = rows[0].id_user;
-        showView();
-    });
-});
 /* io's socket.io */
 
 function showDataUser() {
@@ -199,8 +180,8 @@ io.on('connection', function(socket) {
     // console.log('a user connected');
 
     var user_connected;
-    
-    function refreshListUsers(){
+
+    function refreshListUsers() {
         connection.query("SELECT user_id, user_name FROM `online`;", function(err, rows, fields) {
             if (err) throw err;
             io.emit('loaded users', rows);
@@ -212,18 +193,18 @@ io.on('connection', function(socket) {
         connection.query("INSERT IGNORE INTO `online` (`id`, `user_id`, `user_name`) VALUES (NULL, '" + msg['id'] + "', '" + msg['name'] + "');", function(err, rows, fields) {
             if (err) throw err;
             user_connected = msg['id'];
-            
+
             refreshListUsers();
             showDataUser();
         });
-        
+
 
     });
 
     socket.on('disconnect', function() {
         connection.query("DELETE FROM `online` WHERE `user_id` = '" + user_connected + "';", function(err, rows, fields) {
             if (err) throw err;
-            
+
             refreshListUsers();
             showDataUser();
         });
