@@ -162,17 +162,8 @@ app.get('/chats/', function(req, res) {
         });
     }
 
-    function loadUsers() {
 
-        connection.query("SELECT user_id, user_name FROM `online`;", function(err, rows, fields) {
-            if (err) throw err;
-            users = rows;
-            loadUserLogged();
-        });
-
-    }
-
-    loadUsers();
+    loadUserLogged();
 
 });
 
@@ -208,25 +199,34 @@ io.on('connection', function(socket) {
     // console.log('a user connected');
 
     var user_connected;
+    
+    function refreshListUsers(){
+        connection.query("SELECT user_id, user_name FROM `online`;", function(err, rows, fields) {
+            if (err) throw err;
+            io.emit('loaded users', rows);
+        });
+    }
 
     socket.on('chat message', function(msg) {
 
         connection.query("INSERT IGNORE INTO `online` (`id`, `user_id`, `user_name`) VALUES (NULL, '" + msg['id'] + "', '" + msg['name'] + "');", function(err, rows, fields) {
             if (err) throw err;
+            user_connected = msg['id'];
+            
+            refreshListUsers();
+            showDataUser();
         });
-        user_connected = msg['id'];
         
-        showDataUser();
 
     });
 
     socket.on('disconnect', function() {
-        // console.log('user disconnected ' + user_connected);
         connection.query("DELETE FROM `online` WHERE `user_id` = '" + user_connected + "';", function(err, rows, fields) {
             if (err) throw err;
+            
+            refreshListUsers();
+            showDataUser();
         });
-        
-        showDataUser();
     });
 
 });

@@ -1,28 +1,35 @@
 {% include 'header.twig' %} 
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.slim.js"></script>
 <script>
     var socket = io.connect('https://chatp2p-evandrozanatta.c9users.io');
 
-    console.log(socket.id);
-    
     socket.on('connect', function(){
         console.log(socket.id);
-        
+        console.log("ok");
         socket.emit('chat message', { id: '{{ user_logged.id }}', name: '{{ user_logged.name }}' });
-        
     });
+    
+    function loadUsers(msg){
+        $('#list-users').html('');
+        $.each( msg, function( key, value ) {
+            console.log(value);
+            $('#list-users').prepend( '<li id="user-'+value.user_id+'"><a style="color: blue;" href="/chat/?call='+value.user_id+'">Falar com '+value.user_name+'</a></li>' );
+        });
+        
+    }
+    
+    socket.on('loaded users', function(msg){
+        loadUsers(msg);
+    });
+    
 </script>
 
 <h1>Chats</h1>
 
-<ul>
-    {% for user in users %}
-        <li>
-            <a id="user-{{ user.user_id }}'" href="/chat/?call={{ user.user_id }}">Falar com {{ user.user_name }}</a>
-        </li>
-        <br>
-    {% endfor %}
+<ul id="list-users">
+    <br>
 </ul>
 
 {% include 'footer.twig' %}
